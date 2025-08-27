@@ -1,0 +1,38 @@
+name: lint and format
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        run: |
+          python -m venv .venv/
+          source .venv/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install --group ci
+          python -m pip install .
+      - name: Permanently activate venv
+        run: echo "$PWD/.venv/bin" >> $GITHUB_PATH
+      - name: Run ruff check linter
+        run: |
+          ruff check --output-format=github src/ tests/ examples/
+      - name: Run ruff format formatter
+        run: |
+          ruff format --diff src/ tests/ examples/
+      - name: Run pyright type checker
+        uses: jakebailey/pyright-action@v2
+        with:
+          pylance-version: latest-release
