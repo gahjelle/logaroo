@@ -2,7 +2,6 @@
 
 import contextlib
 import os
-import time
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Protocol
@@ -53,7 +52,7 @@ class Logger:
             "LOGAROO_TIMESTAMP_FORMAT", "%Y-%m-%d %H:%M:%S.%f"
         )
         self._timezone = ZoneInfo(os.getenv("LOGAROO_TIMEZONE", "UTC"))
-        self._start = time.perf_counter()
+        self._start = datetime.now(tz=self._timezone)
 
     @property
     def level(self) -> str:
@@ -121,14 +120,15 @@ class Logger:
         format_args = {
             key: value() if callable(value) else value for key, value in kwargs.items()
         }
+        now = datetime.now(tz=self._timezone)
         return self.template.format(
             message=message.format(**format_args),
             level=level_cfg.name.upper(),
             no=level_cfg.no,
             color=level_cfg.color,
             icon=level_cfg.icon,
-            time=datetime.now(tz=self._timezone).strftime(self._timestamp_format),
-            elapsed=f"{time.perf_counter() - self._start:.6f}",
+            time=now.strftime(self._timestamp_format),
+            elapsed=now - self._start,
         )
 
     def log(self, level: str, message: str, **kwargs: Any) -> None:  # noqa: ANN401
