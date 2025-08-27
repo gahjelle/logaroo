@@ -157,7 +157,7 @@ class Logger:
         """Add a new log level to the logger."""
         self.levels = self._update_levels(
             [
-                Level(name=name, no=no, color=color, icon=icon),
+                Level(name=name.lower(), no=no, color=color, icon=icon),
                 *self.levels.values(),
             ]
         )
