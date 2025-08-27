@@ -74,7 +74,7 @@ venv = ".venv"
 
 
 [tool.bumpver]
-current_version = "v0.1.0"
+current_version = "v0.1.1"
 version_pattern = "vMAJOR.MINOR.PATCH"
 commit_message = "bump version {old_version} -> {new_version}"
 tag_message = "{new_version}"
@@ -83,5 +83,5 @@ tag = true
 push = true
 
 [tool.bumpver.file_patterns]
-"pyproject.toml" = ['version = "{version"', 'current_version = "{version}"']
+"pyproject.toml" = ['', 'current_version = "{version}"']
 "src/logaroo/__init__.py" = ['__version__ = "MAJOR.MINOR.PATCH"']
