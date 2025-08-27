@@ -1,13 +1,14 @@
 """The Logaroo core Logger class."""
 
 import contextlib
+import os
 import time
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Protocol
 from zoneinfo import ZoneInfo
 
-from logaroo.console import console
+from logaroo.console import Printer
 
 
 class LogarooError(Exception):
@@ -30,24 +31,6 @@ class Level:
     name: str
     color: str
     icon: str
-    raise_error: bool = False
-
-
-DEFAULT_LEVELS = [
-    Level(5, "trace", "[cyan]", "\N{PENCIL}\ufe0f"),
-    Level(10, "debug", "[blue]", "\N{LADY BEETLE}"),
-    Level(20, "info", "[white]", "\N{INFORMATION SOURCE}\ufe0f"),
-    Level(25, "success", "[green]", "\N{WHITE HEAVY CHECK MARK}"),
-    Level(30, "warning", "[yellow]", "\N{WARNING SIGN}\ufe0f"),
-    Level(40, "error", "[red]", "\N{CROSS MARK}"),
-    Level(
-        50,
-        "critical",
-        "[white on red]",
-        "\N{SKULL AND CROSSBONES}\ufe0f",
-        raise_error=True,
-    ),
-]
 
 
 class Logger:
@@ -57,17 +40,19 @@ class Logger:
         self,
         level: str,
         template: str,
-        timestamp_format: str,
-        timezone: ZoneInfo,
-        levels: list[Level] | None = None,
+        levels: list[Level],
+        console: Printer,
     ) -> None:
         """Initialize the logger."""
-        self.levels = self._update_levels(DEFAULT_LEVELS if levels is None else levels)
+        self.levels = self._update_levels(levels)
         self.level = level
         self.template = template
-        self.timestamp_format = timestamp_format
-        self.timezone = timezone
+        self.console = console
 
+        self._timestamp_format = os.getenv(
+            "LOGAROO_TIMESTAMP_FORMAT", "%Y-%m-%d %H:%M:%S.%f"
+        )
+        self._timezone = ZoneInfo(os.getenv("LOGAROO_TIMEZONE", "UTC"))
         self._start = time.perf_counter()
 
     @property
@@ -142,7 +127,7 @@ class Logger:
             no=level_cfg.no,
             color=level_cfg.color,
             icon=level_cfg.icon,
-            time=datetime.now(tz=self.timezone).strftime(self.timestamp_format),
+            time=datetime.now(tz=self._timezone).strftime(self._timestamp_format),
             elapsed=f"{time.perf_counter() - self._start:.6f}",
         )
 
@@ -152,11 +137,9 @@ class Logger:
         if cfg.no < self.level_cfg.no:
             return
 
-        console.print(self._format_message(message, cfg, **kwargs, keep_markup=True))
-        if cfg.raise_error:
-            raise LogarooError(
-                self._format_message(message, cfg, **kwargs, keep_markup=False)
-            )
+        self.console.print(
+            self._format_message(message, cfg, **kwargs, keep_markup=True)
+        )
 
     def __getattr__(self, name: str) -> LogFunction:
         """Create logging functions for each level dynamically."""
@@ -170,13 +153,11 @@ class Logger:
         """Including logging functions in available attributes."""
         return [*super().__dir__(), *self._log_funcs]
 
-    def add_level(
-        self, name: str, no: int, color: str, icon: str, *, raise_error: bool = False
-    ) -> None:
+    def add_level(self, name: str, no: int, color: str, icon: str) -> None:
         """Add a new log level to the logger."""
         self.levels = self._update_levels(
             [
-                Level(no, name, color, icon, raise_error=raise_error),
+                Level(name=name, no=no, color=color, icon=icon),
                 *self.levels.values(),
             ]
         )

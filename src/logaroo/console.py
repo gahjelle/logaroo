@@ -7,11 +7,19 @@ set NO_COLOR to use Rich but disable color. Otherwise, regular print() is used.
 import os
 from typing import Protocol
 
-__all__ = ["console"]
+__all__ = ["get_console", "get_print_console", "get_rich_console"]
 
 
 class Printer(Protocol):
     def print(self, *objects: str, sep: str = ..., end: str = ...) -> None: ...
+
+
+def get_console() -> Printer:
+    """Set up a console, either using Rich or the built-in print function."""
+    try:
+        return get_rich_console()
+    except ImportError:  # pragma: no cover
+        return get_print_console()
 
 
 def get_print_console() -> Printer:
@@ -36,14 +44,8 @@ def get_rich_console() -> Printer:
     """
     from rich.console import Console  # noqa: PLC0415
 
-    if os.environ.get("LOGAROO_NO_RICH"):
+    if os.environ.get("LOGAROO_NO_RICH"):  # pragma: no cover
         msg = "Rich is turned off by LOGAROO_NO_RICH"
         raise ImportError(msg)
 
     return Console()
-
-
-try:
-    console = get_rich_console()
-except ImportError:
-    console = get_print_console()
