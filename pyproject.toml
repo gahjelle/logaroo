@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "logaroo"
-version = "0.1.0"
+version = "0.0.1"
 description = "Bouncy logging for Python"
 readme = "README.md"
 authors = [{ name = "Geir Arne Hjelle", email = "geirarne@gmail.com" }]
@@ -74,7 +74,7 @@ venv = ".venv"
 
 
 [tool.bumpver]
-current_version = "v0.1.0"
+current_version = "v0.0.1"
 version_pattern = "vMAJOR.MINOR.PATCH"
 commit_message = "bump version {old_version} -> {new_version}"
 tag_message = "{new_version}"
