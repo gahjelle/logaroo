@@ -503,8 +503,13 @@ wheels = [
 
 [[package]]
 name = "logaroo"
-version = "0.1.1"
+version = "0.1.2"
 source = { editable = "." }
+
+[package.optional-dependencies]
+rich = [
+    { name = "rich" },
+]
 
 [package.dev-dependencies]
 build = [
@@ -526,9 +531,6 @@ dev = [
     { name = "rich" },
     { name = "ruff" },
 ]
-rich = [
-    { name = "rich" },
-]
 test = [
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -536,6 +538,8 @@ test = [
 ]
 
 [package.metadata]
+requires-dist = [{ name = "rich", marker = "extra == 'rich'", specifier = ">=14.1.0" }]
+provides-extras = ["rich"]
 
 [package.metadata.requires-dev]
 build = [
@@ -557,7 +561,6 @@ dev = [
     { name = "rich", specifier = ">=14.1.0" },
     { name = "ruff", specifier = ">=0.12.10" },
 ]
-rich = [{ name = "rich", specifier = ">=14.1.0" }]
 test = [
     { name = "pytest", specifier = ">=8.4.1" },
     { name = "pytest-cov", specifier = ">=6.2.1" },
