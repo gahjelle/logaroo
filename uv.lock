@@ -513,6 +513,7 @@ build = [
 ]
 ci = [
     { name = "pytest" },
+    { name = "rich" },
     { name = "ruff" },
 ]
 dev = [
@@ -543,6 +544,7 @@ build = [
 ]
 ci = [
     { name = "pytest", specifier = ">=8.4.1" },
+    { name = "rich", specifier = ">=14.1.0" },
     { name = "ruff", specifier = ">=0.12.10" },
 ]
 dev = [
