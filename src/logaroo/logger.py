@@ -138,9 +138,7 @@ class Logger:
             return
 
         self.console.print(
-            self._format_message(
-                self.console.escape(message), cfg, **kwargs, keep_markup=True
-            )
+            self._format_message(message, cfg, **kwargs, keep_markup=True)
         )
 
     def __getattr__(self, name: str) -> LogFunction:
