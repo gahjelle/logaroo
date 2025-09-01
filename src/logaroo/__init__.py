@@ -27,4 +27,4 @@ logger = Logger(
 
 __all__ = ["Level", "LogarooError", "Logger", "logger"]
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
