@@ -87,7 +87,7 @@ def test_formatting_of_log_message(
         "This is a {adjective} test: {pi:.3f}", adjective="fun", pi=3.14159
     )
 
-    stdout = capsys.readouterr().out.strip()
+    stdout = capsys.readouterr().out.strip().removesuffix("[/]")
     assert stdout.endswith("This is a fun test: 3.142")
 
 
