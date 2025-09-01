@@ -163,12 +163,12 @@ class Logger:
         )
 
     def log_to_all_levels(
-        self, template: str = "Log with logger.{name}() ({no})"
+        self, message_template: str = "Log with logger.{name}() ({no})"
     ) -> None:
         """Log a message to all log levels."""
         current_level = self.level
         self.level = "trace"
         for level in sorted(self.levels.values()):
             with contextlib.suppress(LogarooError):
-                self.log(level.name, template, name=level.name, no=level.no)
+                self.log(level.name, message_template, name=level.name, no=level.no)
         self.level = current_level
