@@ -91,6 +91,11 @@ def test_formatting_of_log_message(
     assert stdout.endswith("This is a fun test: 3.142")
 
 
+def test_rich_formatting_is_escaped(rich_logger: Logger) -> None:
+    """Test that Rich formatting in a message is escaped."""
+    rich_logger.info("[/]")  # This raises a MarkupError if it's not escaped
+
+
 def test_setting_new_level(logger: Logger) -> None:
     """Test that we can set a new level."""
     logger.level = "warning"

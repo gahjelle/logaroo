@@ -11,7 +11,10 @@ __all__ = ["get_console", "get_print_console", "get_rich_console"]
 
 
 class Printer(Protocol):
-    def print(self, *objects: str, sep: str = ..., end: str = ...) -> None: ...
+    @staticmethod
+    def print(*objects: str, sep: str = ..., end: str = ...) -> None: ...
+    @staticmethod
+    def escape(text: str) -> str: ...
 
 
 def get_console() -> Printer:
@@ -34,6 +37,14 @@ def get_print_console() -> Printer:
             """
             return print(*objects, sep=sep, end=end)  # noqa: T201
 
+        @staticmethod
+        def escape(text: str) -> str:
+            """Escape formatting.
+
+            This is a no-op for print, since no formatting is applied.
+            """
+            return text
+
     return PrintConsole()
 
 
@@ -42,10 +53,24 @@ def get_rich_console() -> Printer:
 
     Raise ImportError if Rich is disabled or not installed.
     """
+    from rich import markup  # noqa: PLC0415
     from rich.console import Console  # noqa: PLC0415
 
     if os.environ.get("LOGAROO_NO_RICH"):  # pragma: no cover
         msg = "Rich is turned off by LOGAROO_NO_RICH"
         raise ImportError(msg)
 
-    return Console()
+    rich_console = Console()
+
+    class RichConsole:
+        @staticmethod
+        def print(*objects: str, sep: str = " ", end: str = "\n") -> None:
+            """Wrap the Rich print function."""
+            return rich_console.print(*objects, sep=sep, end=end)
+
+        @staticmethod
+        def escape(text: str) -> str:
+            """Escape rich formatting."""
+            return markup.escape(text)
+
+    return RichConsole()
